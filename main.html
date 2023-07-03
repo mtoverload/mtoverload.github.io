@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Click Me Button</title>
+  <style>
+    #cash-display {
+      position: fixed;
+      left: 10px;
+      top: 10px;
+    }
+    #click-me-button {
+      position: fixed;
+      left: 10px;
+      top: calc(10px + 2.5em);
+      transform: translateY(-50%);
+    }
+    #clicker-upgrade-button {
+      position: fixed;
+      right: 10px;
+      top: calc(10px + 2.5em);
+      transform: translateY(-50%);
+    }
+    #banker-button {
+      position: fixed;
+      right: 10px;
+      top: calc(10px + 5em);
+      transform: translateY(-50%);
+    }
+    #clicker-count {
+      position: fixed;
+      right: calc(10px + 160px);
+      top: calc(10px + 2.5em);
+      transform: translateY(-50%);
+    }
+    #banker-count {
+      position: fixed;
+      right: calc(10px + 160px);
+      top: calc(10px + 4.0em);
+      transform: translateY(-50%);
+    }
+  </style>
+</head>
+<body>
+  <div id="cash-display">Cash: $0</div>
+  <button id="click-me-button">Click Me!</button>
+  <button id="clicker-upgrade-button" onclick="buyClickerUpgrade()">Clicker ($15)</button>
+  <button id="banker-button" onclick="buyBanker()">Banker ($100)</button>
+  <div id="clicker-count">Clickers: 0</div>
+  <div id="banker-count">Bankers: 0</div>
+
+  <script>
+    var button = document.getElementById("click-me-button");
+    var cash = 0;
+    var baseClickValue = 1;
+    var clickValue = baseClickValue;
+    var clickerUpgradeCost = 15;
+    var clickerUpgradeMultiplier = 1.5;
+    var clickerUpgradeCount = 0;
+    var clickerUpgradeBaseBonus = 0.2;
+    var clickerUpgradeBonus = clickerUpgradeBaseBonus;
+    var bankerCost = 100;
+    var bankerInterval;
+    var bankerIncrement = 3;
+    var bankerCount = 0;
+
+    function incrementCash() {
+      cash += clickValue;
+      updateDisplay();
+    }
+
+    function buyClickerUpgrade() {
+      if (cash >= clickerUpgradeCost) {
+        cash -= clickerUpgradeCost;
+        clickerUpgradeCost = Math.round(clickerUpgradeCost * clickerUpgradeMultiplier * 10) / 10;
+        clickerUpgradeCount++;
+        clickerUpgradeBonus = clickerUpgradeBaseBonus * clickerUpgradeCount;
+        clickValue = baseClickValue + clickerUpgradeBonus;
+        updateDisplay();
+      } else {
+        alert("Insufficient cash to buy the clicker upgrade.");
+      }
+    }
+
+    function activateClickerUpgrade() {
+      clearInterval(upgradeInterval);
+      upgradeInterval = setInterval(function() {
+        cash = Math.round((cash + clickerUpgradeBonus) * 10) / 10;
+        updateDisplay();
+      }, 1000);
+    }
+
+    function buyBanker() {
+      if (cash >= bankerCost) {
+        cash -= bankerCost;
+        bankerCost *= clickerUpgradeMultiplier;
+        bankerCount++;
+        activateBanker();
+      } else {
+        alert("Insufficient cash to hire the banker.");
+      }
+    }
+
+    function activateBanker() {
+      clearInterval(bankerInterval);
+      bankerInterval = setInterval(function() {
+        cash += bankerIncrement;
+        updateDisplay();
+      }, 5000);
+    }
+
+    function updateDisplay() {
+      document.getElementById("cash-display").innerHTML = "Cash: $" + cash.toFixed(1);
+      document.getElementById("clicker-upgrade-button").innerHTML = "Clicker ($" + clickerUpgradeCost.toFixed(1) + ")";
+      document.getElementById("click-me-button").innerHTML = "Click Me! (+" + clickValue.toFixed(1) + ")";
+      document.getElementById("banker-button").innerHTML = "Banker ($" + bankerCost.toFixed(1) + ")";
+      document.getElementById("clicker-count").innerHTML = "Clickers: " + clickerUpgradeCount;
+      document.getElementById("banker-count").innerHTML = "Bankers: " + bankerCount;
+    }
+
+    button.addEventListener("click", incrementCash);
+  </script>
+
+<script>
+  function applyCheatCode(event) {
+    if (event.ctrlKey && event.key === "m") {
+      cash += 10000000;
+      updateDisplay();
+    }
+  }
+
+  document.addEventListener("keydown", applyCheatCode);
+</script>
+</body>
+</html>
